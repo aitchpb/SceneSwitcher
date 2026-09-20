@@ -49,23 +49,10 @@ static void showBackupDialogs(const QString &json)
 
 void AskForBackup(obs_data_t *settings)
 {
-	// This function is called while the plugin settings are being loaded.
-	// Blocking at this stage can cause issues such as OBS failing to start
-	// or crashing.
-	// Therefore, we ask the user whether they want to back up the settings
-	// asynchronously.
-
-	auto json = obs_data_get_json(settings);
-	static QString jsonQString = json ? json : "";
-
-	static const auto askForBackupWrapper = [](void *) {
-		showBackupDialogs(jsonQString);
-	};
-
-	AddFinishedLoadingStep([]() {
-		obs_queue_task(OBS_TASK_UI, askForBackupWrapper, nullptr,
-			       false);
-	});
+	// Local builds change g_GIT_SHA1 on every commit, which would otherwise
+	// prompt for a settings backup on each OBS restart. Skip the dialog.
+	(void)settings;
+	return;
 }
 
 void BackupSettingsOfCurrentVersion()
