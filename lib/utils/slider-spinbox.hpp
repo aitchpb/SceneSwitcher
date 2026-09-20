@@ -30,7 +30,8 @@ private:
 
 	VariableDoubleSpinBox *_spinBox;
 	QSlider *_slider;
-	double _scale = 100.0;
+	// Match setDecimals(5): integer slider steps of 0.00001 in a 0–1 range.
+	double _scale = 100000.0;
 };
 
 } // namespace advss

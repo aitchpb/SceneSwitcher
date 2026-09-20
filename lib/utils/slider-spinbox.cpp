@@ -53,7 +53,8 @@ void SliderSpinBox::SetDoubleValue(const NumberVariable<double> &value)
 {
 	const QSignalBlocker b1(_slider);
 	const QSignalBlocker b2(_spinBox);
-	_slider->setValue(value * _scale);
+	const QSignalBlocker b3(_spinBox->SpinBox());
+	_slider->setValue(qRound(value.GetFixedValue() * _scale));
 	_spinBox->SetValue(value);
 	SetVisibility(value);
 }
@@ -61,8 +62,10 @@ void SliderSpinBox::SetDoubleValue(const NumberVariable<double> &value)
 void SliderSpinBox::SpinBoxValueChanged(const NumberVariable<double> &value)
 {
 	if (value.IsFixedType()) {
-		int sliderPos = value * _scale;
-		_slider->setValue(sliderPos);
+		// Block slider signals so a coarse slider step cannot write
+		// back into the spin box (e.g. 0.98765 → 0.98000).
+		const QSignalBlocker b(_slider);
+		_slider->setValue(qRound(value.GetFixedValue() * _scale));
 	}
 	SetVisibility(value);
 	emit DoubleValueChanged(value);
@@ -71,7 +74,9 @@ void SliderSpinBox::SpinBoxValueChanged(const NumberVariable<double> &value)
 void SliderSpinBox::SliderValueChanged(int value)
 {
 	NumberVariable<double> doubleValue = value / _scale;
+	const QSignalBlocker b(_spinBox->SpinBox());
 	_spinBox->SetValue(doubleValue);
+	emit DoubleValueChanged(doubleValue);
 }
 
 void SliderSpinBox::SetVisibility(const NumberVariable<double> &value)
