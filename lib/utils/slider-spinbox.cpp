@@ -15,6 +15,9 @@ SliderSpinBox::SliderSpinBox(double min, double max, const QString &label,
 	_spinBox->setMinimum(min);
 	_spinBox->setMaximum(max);
 	_spinBox->setDecimals(5);
+	// Default QDoubleSpinBox step is 1.0, which jumps 1.00000 ↔ 0.00000
+	// in a 0–1 threshold field. Match the decimal places instead.
+	_spinBox->SpinBox()->setSingleStep(0.00001);
 
 	connect(_slider, SIGNAL(valueChanged(int)), this,
 		SLOT(SliderValueChanged(int)));
