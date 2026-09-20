@@ -20,6 +20,13 @@ GenericVariableSpinbox::GenericVariableSpinbox(QWidget *parent,
 					   ? ":/res/images/dots-vert.svg"
 					   : "theme:Dark/dots-vert.svg");
 
+	// Commit on Enter / focus-out / arrows only — not on every keystroke.
+	// With tracking on, deleting/typing mid-value calls setValue() and
+	// rewrites the field (e.g. 0.999|00 → 0.99|000), which makes fine
+	// threshold tuning tedious across Video / pattern match UIs.
+	_fixedValueInt->setKeyboardTracking(false);
+	_fixedValueDouble->setKeyboardTracking(false);
+
 	QWidget::connect(_fixedValueInt, SIGNAL(valueChanged(int)), this,
 			 SLOT(SetFixedValue(int)));
 	QWidget::connect(_fixedValueDouble, SIGNAL(valueChanged(double)), this,
